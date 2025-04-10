@@ -18,8 +18,8 @@ WORKDIR /app
 # 從構建階段複製已發佈的應用程式檔案
 COPY --from=build /out .
 
-# 設定容器啟動時運行的指令
-ENTRYPOINT ["dotnet", "backend_stepTogether.dll"]
+# 設定容器啟動時運行的指令（修改為正確的 DLL 名稱）
+ENTRYPOINT ["dotnet", "stepTogether.dll"]
 
 # 開放容器的 80 端口
 EXPOSE 80
