@@ -1,0 +1,6 @@
+@stepTogether_HostAddress = http://localhost:5125
+
+GET {{stepTogether_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
