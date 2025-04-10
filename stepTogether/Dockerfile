@@ -8,7 +8,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # 複製 stepTogether.csproj 到容器中的 /src/stepTogether/
-COPY ./stepTogether.csproj /src/stepTogether/
+COPY ./stepTogether/stepTogether.csproj /src/stepTogether/
 
 # 執行 dotnet restore 來還原專案依賴
 RUN dotnet restore /src/stepTogether/stepTogether.csproj
