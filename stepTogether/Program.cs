@@ -1,5 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using Microsoft.EntityFrameworkCore;
 using stepTogether.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,26 +6,26 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
-builder.Services.AddDbContext<StepTogetherDbContext>(options =>
-    options.UseNpgsql("Host=localhost;Port=5432;Database=stepTogether;Username=postgres;Password=S123456"));
+// ✅ 從設定檔抓取連線字串
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddDbContext<StepTogetherDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// ✅ 開發與部署都顯示 Swagger
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "stepTogether API V1");
+    c.RoutePrefix = ""; // 部署後打開首頁就是 Swagger UI
+});
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
