@@ -50,7 +50,7 @@ else
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("https://backend-steptogether.onrender.com/swagger/v1/swagger.json", "StepTogether API V1"); // 這是部署環境的完整 URL
-        c.RoutePrefix = string.Empty; // 讓Swagger UI在根目錄顯示
+        //c.RoutePrefix = string.Empty; // 讓Swagger UI在根目錄顯示
     });
 }
 
