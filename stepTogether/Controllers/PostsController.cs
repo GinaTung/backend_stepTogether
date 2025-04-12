@@ -27,11 +27,33 @@ namespace stepTogether.Controllers
 
         // POST: api/posts
         [HttpPost]
-        public IActionResult Create(Posts post)
+        public async Task<IActionResult> CreatePost([FromBody] PostInputDto dto)
         {
+            var post = new Posts
+            {
+                Title = dto.Title,
+                Content = dto.Content,
+                Author = dto.Author,
+                CommentCount = dto.CommentCount,
+                CreatedAt = DateTime.UtcNow
+            };
+
             _context.Posts.Add(post);
-            _context.SaveChanges();
-            return CreatedAtAction(nameof(GetAll), new { id = post.Id }, post);
+            await _context.SaveChangesAsync();
+
+            // 轉換成輸出 DTO 回傳
+            var output = new PostOutputDto
+            {
+                Id = post.Id,
+                Title = post.Title,
+                Content = post.Content,
+                Author = post.Author,
+                CommentCount = post.CommentCount,
+                CreatedAt = post.CreatedAt
+            };
+
+            return Ok(output);
         }
+
     }
 }
