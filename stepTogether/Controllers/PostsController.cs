@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 namespace stepTogether.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("stepTogether/user/[controller]")]
     public class PostsController : ControllerBase
     {
         private readonly StepTogetherDbContext _context;
