@@ -12,7 +12,6 @@ namespace stepTogether.Data
         {
         }
 
-        public DbSet<Company> Companies { get; set; }
         public DbSet<User> Users { get; set; }
 
         public DbSet<Posts> Posts { get; set; }
@@ -22,7 +21,7 @@ namespace stepTogether.Data
             base.OnModelCreating(modelBuilder);  // 呼叫基底類別的方法
 
             // 明確將 Company 類別映射到小寫的 "companies" 資料表
-            modelBuilder.Entity<Company>().ToTable("companies");
+            //modelBuilder.Entity<Company>().ToTable("companies");
 
             // 強制資料表名稱為小寫
             modelBuilder.Entity<Posts>().ToTable("posts");

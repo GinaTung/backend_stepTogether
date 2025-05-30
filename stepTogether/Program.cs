@@ -1,5 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using stepTogether.Data;
+using stepTogether.Utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,9 +14,29 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<StepTogetherDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// 註冊Swagger
+// 註冊Swagger + JWT 支援
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "請輸入 JWT 授權 token，格式為：Bearer {token}",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+
+    c.OperationFilter<AuthorizeCheckOperationFilter>(); // ✅ 加上鎖頭過濾器
+    c.EnableAnnotations();  // ✅ 支援 [SwaggerOperation] 等標註
+    c.ExampleFilters();     // ✅ 啟用範例支援
+});
+
+// ⬇️ 加上這行讓 Swagger 能找到你的範例資料
+builder.Services.AddSwaggerExamplesFromAssemblyOf<UnauthorizedExample>();
+
 
 // 註冊CORS
 builder.Services.AddCors(op =>
@@ -26,7 +50,16 @@ builder.Services.AddCors(op =>
             .WithOrigins("http://localhost:3000", "https://backend-steptogether.onrender.com");
     });
 });
-
+// 加入驗證
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = JwtHelper.GetValidationParameters();
+});
 // 註冊控制器服務
 builder.Services.AddControllers();
 
@@ -42,6 +75,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("https://localhost:7136/swagger/v1/swagger.json", "StepTogether API V1"); // 本地開發環境用相對路徑
+        c.InjectStylesheet("/swagger/custom.css"); // ← 這行會加載你剛剛的 CSS
     });
 }
 else
@@ -51,6 +85,7 @@ else
     {
         c.SwaggerEndpoint("https://backend-steptogether.onrender.com/swagger/v1/swagger.json", "StepTogether API V1"); // 這是部署環境的完整 URL
         //c.RoutePrefix = string.Empty; // 讓Swagger UI在根目錄顯示
+        c.InjectStylesheet("/swagger/custom.css"); // ← 這行會加載你剛剛的 CSS
     });
 }
 
@@ -59,9 +94,10 @@ app.UseHttpsRedirection();
 
 // 啟用CORS
 app.UseCors("WISE_CORS");
-
+app.UseAuthentication(); // 放在 Authorization 前面
 // 啟用授權
 app.UseAuthorization();
+app.UseStaticFiles();
 
 // 映射控制器
 app.MapControllers();
