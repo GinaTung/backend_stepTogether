@@ -22,9 +22,9 @@ namespace stepTogether.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("signin")]
+        [HttpPost("signup")]
         [SwaggerOperation(Tags = new[] { "會員註冊、登入登出" })]
-        public async Task<IActionResult> Signin([FromBody] SigninRequest req)
+        public async Task<IActionResult> Signup([FromBody] SignupRequest req)
         {
             var existing = await _supabase.SupabaseClient
                 .From<Member>()
@@ -59,14 +59,14 @@ namespace stepTogether.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("login")]
+        [HttpPost("signin")]
         [SwaggerOperation(Tags = new[] { "會員註冊、登入登出" })]
         [SwaggerResponse(200, "登入成功", typeof(ApiResponse<object>))]
         [SwaggerResponse(401, "帳號或密碼錯誤", typeof(ApiResponse<string>))]
         [SwaggerResponseExample(401, typeof(UnauthorizedExample))]
 
 
-        public async Task<IActionResult> Login([FromBody] LoginRequest req)
+        public async Task<IActionResult> Signin([FromBody] SigninRequest req)
         {
             var result = await _supabase.SupabaseClient
                 .From<Member>()
