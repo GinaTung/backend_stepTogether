@@ -43,7 +43,7 @@ builder.Services.AddCors(op =>
 {
     op.AddPolicy("WISE_CORS", set =>
     {
-        set.WithOrigins("http://localhost:5173", "https://backend-steptogether.onrender.com")
+        set.WithOrigins("http://localhost:5173", "https://backend-steptogether.onrender.com", "https://ginatung.github.io")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
