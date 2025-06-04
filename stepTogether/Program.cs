@@ -43,11 +43,10 @@ builder.Services.AddCors(op =>
 {
     op.AddPolicy("WISE_CORS", set =>
     {
-        set.SetIsOriginAllowed(origin => true)
+        set.WithOrigins("http://localhost:5173", "https://backend-steptogether.onrender.com")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials()
-            .WithOrigins("http://localhost:3000", "https://backend-steptogether.onrender.com");
+            .AllowCredentials();
     });
 });
 // 加入驗證
