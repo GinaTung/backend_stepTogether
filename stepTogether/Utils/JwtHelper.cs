@@ -5,11 +5,16 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace stepTogether.Utils
 {
-    public static class JwtHelper
+    public class JwtHelper
     {
-        private static string SecretKey = "THIS_IS_A_VERY_STRONG_SECRET_KEY_123!"; // 至少 32 字元
+        private readonly IConfiguration _config;
 
-        public static string GenerateToken(string userId, string email, string role, int expireDays = 7)
+        public JwtHelper(IConfiguration config)
+        {
+            _config = config;
+        }
+
+        public string GenerateToken(string userId, string email, string role, int expireDays = 7)
         {
             var claims = new[]
             {
@@ -19,12 +24,12 @@ namespace stepTogether.Utils
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? ""));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: "your-app",
-                audience: "your-app",
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddDays(expireDays),
                 signingCredentials: creds
@@ -33,15 +38,18 @@ namespace stepTogether.Utils
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public static TokenValidationParameters GetValidationParameters() => new TokenValidationParameters
+        public TokenValidationParameters GetValidationParameters()
         {
-            ValidateIssuer = true,
-            ValidIssuer = "your-app",
-            ValidateAudience = true,
-            ValidAudience = "your-app",
-            ValidateLifetime = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey)),
-            ValidateIssuerSigningKey = true
-        };
+            return new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = _config["Jwt:Issuer"],
+                ValidateAudience = true,
+                ValidAudience = _config["Jwt:Audience"],
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? ""))
+            };
+        }
     }
 }

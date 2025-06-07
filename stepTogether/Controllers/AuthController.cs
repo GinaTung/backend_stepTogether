@@ -15,10 +15,12 @@ namespace stepTogether.Controllers
     public class AuthController : ControllerBase
     {
         private readonly SupabaseService _supabase;
+        private readonly JwtHelper _jwtHelper;
 
-        public AuthController()
+        public AuthController(SupabaseService supabase, JwtHelper jwtHelper)
         {
-            _supabase = new SupabaseService();
+            _supabase = supabase;
+            _jwtHelper = jwtHelper;
         }
 
         [AllowAnonymous]
@@ -64,8 +66,6 @@ namespace stepTogether.Controllers
         [SwaggerResponse(200, "登入成功", typeof(ApiResponse<object>))]
         [SwaggerResponse(401, "帳號或密碼錯誤", typeof(ApiResponse<string>))]
         [SwaggerResponseExample(401, typeof(UnauthorizedExample))]
-
-
         public async Task<IActionResult> Signin([FromBody] SigninRequest req)
         {
             var result = await _supabase.SupabaseClient
@@ -78,7 +78,7 @@ namespace stepTogether.Controllers
             if (user == null || !PasswordHasher.Verify(req.Password, user.PasswordHash))
                 return Unauthorized(ApiResponse<string>.Fail("帳號或密碼錯誤"));
 
-            var token = JwtHelper.GenerateToken(user.Id.ToString(), user.Email, user.Role ?? "一般會員");
+            var token = _jwtHelper.GenerateToken(user.Id.ToString(), user.Email, user.Role ?? "一般會員");
 
             return Ok(ApiResponse<object>.Ok(new { token }, "登入成功"));
         }
