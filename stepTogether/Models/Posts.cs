@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Supabase.Postgrest.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using static PostOutputDto;
 [Table("posts")] 
-public class Posts
+public class Posts : BaseModel
 {
     [Key]
     [Column("id")]
