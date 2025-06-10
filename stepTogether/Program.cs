@@ -14,9 +14,11 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<StepTogetherDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// 註冊Swagger + JWT 支援
-builder.Services.AddEndpointsApiExplorer();
+// 註冊 JwtHelper 為 Singleton（全域共享）
+builder.Services.AddSingleton<JwtHelper>();
 
+// 設定 Swagger + JWT 支援
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -29,28 +31,30 @@ builder.Services.AddSwaggerGen(c =>
         BearerFormat = "JWT"
     });
 
-    c.OperationFilter<AuthorizeCheckOperationFilter>(); // ✅ 加上鎖頭過濾器
-    c.EnableAnnotations();  // ✅ 支援 [SwaggerOperation] 等標註
-    c.ExampleFilters();     // ✅ 啟用範例支援
+    c.OperationFilter<AuthorizeCheckOperationFilter>();
+    c.EnableAnnotations();
+    c.ExampleFilters();
 });
-
-// ⬇️ 加上這行讓 Swagger 能找到你的範例資料
 builder.Services.AddSwaggerExamplesFromAssemblyOf<UnauthorizedExample>();
 
-
-// 註冊CORS
+// 設定 CORS
 builder.Services.AddCors(op =>
 {
     op.AddPolicy("WISE_CORS", set =>
     {
-        set.SetIsOriginAllowed(origin => true)
+        set.WithOrigins("http://localhost:5173", "https://backend-steptogether.onrender.com", "https://ginatung.github.io")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials()
-            .WithOrigins("http://localhost:3000", "https://backend-steptogether.onrender.com");
+            .AllowCredentials();
     });
 });
-// 加入驗證
+
+// 先建立暫時的 JwtHelper 來讀取驗證參數
+var tempJwtHelper = new JwtHelper(builder.Configuration);
+
+// 註冊 JWT 驗證
+builder.Services.AddSingleton<SupabaseService>();
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -58,9 +62,9 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.TokenValidationParameters = JwtHelper.GetValidationParameters();
+    options.TokenValidationParameters = tempJwtHelper.GetValidationParameters();
 });
-// 註冊控制器服務
+
 builder.Services.AddControllers();
 
 var app = builder.Build();
@@ -74,32 +78,27 @@ if (app.Environment.IsDevelopment())
     // 開發環境：Swagger 設為 /swagger 頁面
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("https://localhost:7136/swagger/v1/swagger.json", "StepTogether API V1"); // 本地開發環境用相對路徑
+        c.SwaggerEndpoint("https://localhost:7136/swagger/v1/swagger.json", "StepTogether API V1");
         c.InjectStylesheet("/swagger/custom.css"); // ← 這行會加載你剛剛的 CSS
     });
 }
 else
 {
-    // 部署環境：Swagger 設置在根目錄
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("https://backend-steptogether.onrender.com/swagger/v1/swagger.json", "StepTogether API V1"); // 這是部署環境的完整 URL
+        c.SwaggerEndpoint("https://backend-steptogether.onrender.com/swagger/v1/swagger.json", "StepTogether API V1");
         //c.RoutePrefix = string.Empty; // 讓Swagger UI在根目錄顯示
-        c.InjectStylesheet("/swagger/custom.css"); // ← 這行會加載你剛剛的 CSS
     });
 }
 
 // 啟用HTTPS重定向
 app.UseHttpsRedirection();
-
 // 啟用CORS
 app.UseCors("WISE_CORS");
 app.UseAuthentication(); // 放在 Authorization 前面
 // 啟用授權
 app.UseAuthorization();
 app.UseStaticFiles();
-
 // 映射控制器
 app.MapControllers();
-
 app.Run();
