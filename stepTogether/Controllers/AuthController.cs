@@ -28,6 +28,8 @@ namespace stepTogether.Controllers
         [SwaggerOperation(Tags = new[] { "會員註冊、登入登出" })]
         public async Task<IActionResult> Signup([FromBody] SignupRequest req)
         {
+            Console.WriteLine(_supabase?.SupabaseClient == null ? "Client is null" : "Client is OK");
+
             var existing = await _supabase.SupabaseClient
                 .From<Member>()
                 .Where(m => m.Email == req.Email)

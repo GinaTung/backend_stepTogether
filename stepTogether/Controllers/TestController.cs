@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MemberApi.Controllers
+namespace stepTogether.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
