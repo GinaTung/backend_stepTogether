@@ -48,6 +48,77 @@ namespace stepTogether.Controllers
             });
         }
 
+
+        [HttpPost("profile")]
+        [Authorize]
+        public async Task<IActionResult> CreateProfile([FromBody] CreateProfileDto input)
+        {
+            if (string.IsNullOrEmpty(input.Email) || string.IsNullOrEmpty(input.Role))
+                return BadRequest("Email and Role are required.");
+
+            var profile = new Profile
+            {
+                Email = input.Email,
+                Role = input.Role
+                // 不需要指定 Id，Supabase 會自動產生
+            };
+
+            var result = await _supabase.SupabaseClient
+                .From<Profile>()
+                .Insert(profile);
+
+            return Ok(new
+            {
+                profile.Email,
+                profile.Role
+            });
+
+        }
+
+
+        [HttpPut("profile/{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile(string id, [FromBody] UpdateProfileDto updatedData)
+        {
+            if (string.IsNullOrEmpty(id) || updatedData == null)
+                return BadRequest("Invalid data.");
+
+            // 先取得原始資料
+            var existingResult = await _supabase.SupabaseClient
+                .From<Profile>()
+                .Where(p => p.Id == id)
+                .Get();
+
+            var existingProfile = existingResult.Models.FirstOrDefault();
+            if (existingProfile == null)
+                return NotFound("Profile not found.");
+
+            // 更新要修改的欄位
+            existingProfile.Email = updatedData.Email;
+            existingProfile.Role = updatedData.Role;
+
+            var updateResult = await _supabase.SupabaseClient
+                .From<Profile>()
+                .Update(existingProfile);
+
+            return Ok(new { message = "Profile updated", data = updateResult.Models.FirstOrDefault() });
+        }
+        [HttpDelete("profile/{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteProfile(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return BadRequest("Missing profile ID.");
+
+            var profile = new Profile { Id = id };
+
+            var result = await _supabase.SupabaseClient
+                .From<Profile>()
+                .Delete(profile);
+
+            return Ok(new { message = "Profile deleted", data = result.Models.FirstOrDefault() });
+        }
+
     }
 
 }

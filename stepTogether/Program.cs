@@ -4,6 +4,9 @@ using stepTogether.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using Newtonsoft.Json;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,7 +68,13 @@ builder.Services.AddAuthentication(options =>
     options.TokenValidationParameters = tempJwtHelper.GetValidationParameters();
 });
 
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+    });
+
 
 var app = builder.Build();
 
