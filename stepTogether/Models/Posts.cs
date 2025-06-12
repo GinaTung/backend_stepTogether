@@ -1,128 +1,156 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
+using Supabase.Postgrest;
+using Supabase.Postgrest.Attributes;
+using Supabase.Postgrest.Models;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization; // for JsonPropertyName in Output DTO
+using Supabase.Postgrest.Attributes;
+
 using static PostOutputDto;
-[Table("posts")] 
-public class Posts
+
+[Table("posts")]
+public class Posts : BaseModel
 {
-    [Key]
-    [Column("id")]
+    [PrimaryKey("id", false)]
+    [JsonProperty("id")]
     public int Id { get; set; }
 
     [Required]
-    [Column("title")]
+    [JsonProperty("title")]
     public string Title { get; set; }
 
     [Required]
-    [Column("content")]
+    [JsonProperty("content")]
     public string Content { get; set; }
 
     [Required]
-    [Column("author")]
+    [JsonProperty("author")]
     public string Author { get; set; }
 
     [Required]
-    [Column("category")]
+    [JsonProperty("category")]
     public string Category { get; set; }
 
-    [Column("tags")]
-    public List<string>? Tags { get; set; } = new() { "ALL" };
+    [JsonProperty("tags")]
+    public List<string>? Tags { get; set; }
 
 
-    [Column("commentcount")]
+    [JsonProperty("commentcount")]
     public int CommentCount { get; set; }
 
-    [Column("createdat")]
+    [JsonProperty("createdat")]
     public DateTime CreatedAt { get; set; }
 
-    [Column("updatedat")]
+    [JsonProperty("updatedat")]
     public DateTime? UpdatedAt { get; set; }
+
     [Required]
-    [Column("status")]
+    [JsonProperty("status")]
     public string Status { get; set; }
 
-    [Column("review_status")]
-    [JsonPropertyName("review_status")]
+    [JsonProperty("review_status")]
     public string? ReviewStatus { get; set; }
 
-    [Column("viewcount")]
+    [JsonProperty("viewcount")]
     public int ViewCount { get; set; }
 
-    [Column("likecount")]
+    [JsonProperty("likecount")]
     public int LikeCount { get; set; }
 
-    //[Column("hidden_deleted_log", TypeName = "jsonb")]
+    //[JsonProperty("hidden_deleted_log")]
     //public List<HiddenLog>? HiddenDeletedLog { get; set; } = new();
 
-    [Column("image_url")]
+    [JsonProperty("image_url")]
     public List<string>? ImageUrl { get; set; }
+    [JsonProperty("usermail")]
+    [Column("usermail")]
+    public string? UserMail { get; set; } = string.Empty;
 }
-
 public class PostInputDto
 {
     [Required]
-    [Column("title")]
+    [JsonProperty("title")]
     public string Title { get; set; }
 
     [Required]
-    [Column("content")]
+    [JsonProperty("content")]
     public string Content { get; set; }
 
     [Required]
-    [Column("author")]  // 映射小寫欄位名稱
+    [JsonProperty("author")]
     public string Author { get; set; }
 
     [Required]
-    [Column("category")]
+    [JsonProperty("category")]
     public string Category { get; set; }
+
     [Required]
-    [Column("status")]
+    [JsonProperty("status")]
     public string Status { get; set; }
+}
+
+public class PostUpdateDto
+{
+
+    public string? Title { get; set; }
+    public string? Content { get; set; }
+    public List<string>? Tags { get; set; }
+    public string? Author { get; set; }
+    public string? Category { get; set; }
+    public string? Status { get; set; }
+    public string? ImageUrl { get; set; }
 }
 public class PostOutputDto
 {
-    [Column("id")]
+    [JsonProperty("id")]
     public int Id { get; set; }
-    [Column("title")]
-    public string Title { get; set; }
-    [Column("content")]
-    public string Content { get; set; }
-    [Column("author")]  // 映射小寫欄位名稱
-    public string Author { get; set; }
-    [Column("category")]
-    public string Category { get; set; }
-    [Column("tags")]
-    public List<string>? Tags { get; set; } = new() { "ALL" };
 
-    [Column("commentcount")]
+    [JsonProperty("title")]
+    public string Title { get; set; }
+
+    [JsonProperty("content")]
+    public string Content { get; set; }
+
+    [JsonProperty("author")]
+    public string Author { get; set; }
+
+    [JsonProperty("category")]
+    public string Category { get; set; }
+
+    [JsonProperty("tags")]
+    public List<string>? Tags { get; set; }
+
+
+    [JsonProperty("commentcount")]
     public int CommentCount { get; set; }
-    [Column("createdat")]
+
+    [JsonProperty("createdat")]
     public DateTime CreatedAt { get; set; }
-    [Column("updatedat")]
+
+    [JsonProperty("updatedat")]
     public DateTime? UpdatedAt { get; set; }
-    [Column("status")]
+
+    [JsonProperty("status")]
     public string Status { get; set; }
 
-    [Column("review_status")]
-    [JsonPropertyName("review_status")]
+    [JsonPropertyName("review_status")] // 使用 System.Text.Json 命名
     public string ReviewStatus { get; set; }
 
-    [Column("viewcount")]
+    [JsonProperty("viewcount")]
     public int ViewCount { get; set; }
 
-    [Column("likecount")]
+    [JsonProperty("likecount")]
     public int LikeCount { get; set; }
 
-    //[Column("hidden_deleted_log", TypeName = "jsonb")]
+    //[JsonProperty("hidden_deleted_log")]
     //public List<HiddenLog>? HiddenDeletedLog { get; set; } = new();
 
-
-    [Column("image_url")]
+    [JsonProperty("image_url")]
     public List<string>? ImageUrl { get; set; }
 }
 public class HiddenLog
 {
-    public string Action { get; set; }  // 例如 "delete"
+    public string Action { get; set; }
     public DateTime Timestamp { get; set; }
     public string User { get; set; }
 }

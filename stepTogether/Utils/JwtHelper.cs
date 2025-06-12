@@ -51,5 +51,10 @@ namespace stepTogether.Utils
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? ""))
             };
         }
+
+        public string? GetMailFromToken(ClaimsPrincipal user)
+        {
+            return user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        }
     }
 }
