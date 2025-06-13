@@ -32,7 +32,7 @@ namespace stepTogether.Controllers
                 .From<Posts>()
                 .Get();
 
-            var posts = result.Models.FirstOrDefault();
+            var posts = result.Models;
 
             if (posts == null)
                 return NotFound("Profile not found");
