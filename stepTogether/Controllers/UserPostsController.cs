@@ -69,7 +69,10 @@ namespace stepTogether.Controllers
                 CreatedAt = DateTime.UtcNow,
                 Category = dto.Category,
                 Status = dto.Status,
-                UserMail = userMail // ⭐ 加入 usermail
+                UserMail = userMail, // ⭐ 加入 usermail
+                Tags = dto.Tags,
+                ImageUrl = dto.ImageUrl,
+                ReviewStatus = dto.ReviewStatus,
             };
 
             var result = await _supabase.SupabaseClient
@@ -79,7 +82,6 @@ namespace stepTogether.Controllers
             // 回傳結果
             var output = new PostOutputDto
             {
-                Id = post.Id,
                 Title = post.Title,
                 Content = post.Content,
                 Author = post.Author,
@@ -87,6 +89,7 @@ namespace stepTogether.Controllers
                 CreatedAt = post.CreatedAt,
                 Category = post.Category,
                 UpdatedAt = post.UpdatedAt,
+                Tags = dto.Tags,
                 Status = post.Status,
                 ReviewStatus = post.ReviewStatus,
                 ImageUrl = post.ImageUrl

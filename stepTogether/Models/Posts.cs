@@ -23,7 +23,6 @@ public class Posts : BaseModel
     [JsonProperty("content")]
     public string Content { get; set; }
 
-    [Required]
     [JsonProperty("author")]
     public string Author { get; set; }
 
@@ -87,6 +86,14 @@ public class PostInputDto
     [Required]
     [JsonProperty("status")]
     public string Status { get; set; }
+    [JsonProperty("tags")]
+    public List<string>? Tags { get; set; }
+
+    [JsonProperty("image_url")]
+    public List<string>? ImageUrl { get; set; }
+
+    [JsonProperty("review_status")]
+    public string? ReviewStatus { get; set; }
 }
 
 public class PostUpdateDto
@@ -102,9 +109,6 @@ public class PostUpdateDto
 }
 public class PostOutputDto
 {
-    [JsonProperty("id")]
-    public int Id { get; set; }
-
     [JsonProperty("title")]
     public string Title { get; set; }
 
