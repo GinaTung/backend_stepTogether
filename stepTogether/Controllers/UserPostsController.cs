@@ -124,13 +124,15 @@ namespace stepTogether.Controllers
             if (!string.IsNullOrEmpty(dto.Author)) post.Author = dto.Author;
             if (!string.IsNullOrEmpty(dto.Category)) post.Category = dto.Category;
             if (!string.IsNullOrEmpty(dto.Status)) post.Status = dto.Status;
-            if (!string.IsNullOrEmpty(dto.ImageUrl)) post.ImageUrl = new List<string> { dto.ImageUrl };
 
-            // ✅ 只有有傳入 tags 才更新
+            if (dto.ImageUrl != null)
+                post.ImageUrl = dto.ImageUrl.Distinct().ToList(); ;
+
+            if (!string.IsNullOrEmpty(dto.ReviewStatus))
+                post.ReviewStatus = dto.ReviewStatus;
+
             if (dto.Tags != null)
-            {
                 post.Tags = dto.Tags.Distinct().ToList();
-            }
 
             post.UpdatedAt = DateTime.UtcNow;
 

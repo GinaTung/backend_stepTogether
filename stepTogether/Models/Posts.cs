@@ -61,6 +61,7 @@ public class Posts : BaseModel
 
     [JsonProperty("image_url")]
     public List<string>? ImageUrl { get; set; }
+
     [JsonProperty("usermail")]
     [Column("usermail")]
     public string? UserMail { get; set; } = string.Empty;
@@ -105,7 +106,9 @@ public class PostUpdateDto
     public string? Author { get; set; }
     public string? Category { get; set; }
     public string? Status { get; set; }
-    public string? ImageUrl { get; set; }
+    public List<string>? ImageUrl { get; set; }
+
+    public string? ReviewStatus { get; set; }
 }
 public class PostOutputDto
 {
