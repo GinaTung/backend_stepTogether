@@ -38,6 +38,7 @@ builder.Services.AddSwaggerGen(c =>
     c.EnableAnnotations();
     c.ExampleFilters();
 });
+builder.Services.AddSwaggerGenNewtonsoftSupport();
 builder.Services.AddSwaggerExamplesFromAssemblyOf<UnauthorizedExample>();
 
 // 設定 CORS
@@ -110,4 +111,6 @@ app.UseAuthorization();
 app.UseStaticFiles();
 // 映射控制器
 app.MapControllers();
+//啟用錯誤詳細訊息
+app.UseDeveloperExceptionPage(); // ✅ 加在 app.Run() 前
 app.Run();

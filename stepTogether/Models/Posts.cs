@@ -99,15 +99,20 @@ public class PostInputDto
 
 public class PostUpdateDto
 {
-
+    [JsonProperty("title")]
     public string? Title { get; set; }
+    [JsonProperty("content")]
     public string? Content { get; set; }
+    [JsonProperty("tags")]
     public List<string>? Tags { get; set; }
     public string? Author { get; set; }
+    [JsonProperty("category")]
     public string? Category { get; set; }
+    [JsonProperty("status")]
     public string? Status { get; set; }
+    [JsonProperty("image_url")]
     public List<string>? ImageUrl { get; set; }
-
+    [JsonProperty("review_status")]
     public string? ReviewStatus { get; set; }
 }
 public class PostOutputDto

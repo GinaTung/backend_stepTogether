@@ -143,6 +143,36 @@ namespace stepTogether.Controllers
             return Ok(post);
         }
 
+        // DELETE: stepTogether/user/UserPosts/{id}
+        [HttpDelete("{id}")]
+        [Authorize]
+        [SwaggerOperation(Tags = new[] { "使用者文章管理" })]
+        public async Task<IActionResult> DeleteUserPost(int id)
+        {
+            var userMail = _jwtHelper.GetMailFromToken(User);
+            if (string.IsNullOrEmpty(userMail))
+                return Unauthorized("Invalid token or missing user mail.");
+
+            var existingResult = await _supabase.SupabaseClient
+                .From<Posts>()
+                .Where(p => p.Id == id && p.UserMail == userMail)
+                .Get();
+
+            var post = existingResult.Models.FirstOrDefault();
+            if (post == null)
+                return NotFound("Post not found or you don't have permission to delete it.");
+
+            await _supabase.SupabaseClient
+                .From<Posts>()
+                .Match(new Dictionary<string, string>
+                {
+            { "id", id.ToString() },
+            { "usermail", userMail }  // 一定要用資料庫的欄位名稱
+                })
+                .Delete();
+
+            return Ok(new { message = "Post deleted successfully." });
+        }
 
 
     }
